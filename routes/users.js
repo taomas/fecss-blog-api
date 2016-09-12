@@ -1,6 +1,6 @@
 var router = require('koa-router')();
 
-router.get('/', function *(next) {
+router.get('/login', function *(next) {
   this.body = 'this a users response!';
 });
 

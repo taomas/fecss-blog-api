@@ -8,6 +8,13 @@ var app = require('koa')()
 var index = require('./routes/index');
 var users = require('./routes/users');
 
+var db = require('./config/mongoose')();
+db.on('error', console.error.bind(console, 'error: connect error!'))
+db.once('open', function () {
+  // 一次打开记录
+  console.log('connect success!')
+})
+
 // global middlewares
 app.use(views('views', {
   root: __dirname + '/views',
@@ -30,7 +37,7 @@ app.use(require('koa-static')(__dirname + '/public'));
 koa.use('/', index.routes(), index.allowedMethods());
 koa.use('/users', users.routes(), users.allowedMethods());
 
-// mount root routes  
+// mount root routes
 app.use(koa.routes());
 
 app.on('error', function(err, ctx){
