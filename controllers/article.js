@@ -6,20 +6,13 @@ class Article {
   constructor () {
     this.model = ArticleModel;
   }
-  save (opts, fn) {
+  save (opts) {
     this.entity = new ArticleModel(opts);
-    this.entity.save(opts, function (err, updateEntity) {
-      if (err) return fn(err)
-      fn(updateEntity)
-    });
+    return this.entity.save(opts);
   }
-  query (opts, fn) {
-    this.model.find(opts)
+  query (opts) {
+    return this.model.find(opts)
     .sort({ date: -1 })
-    .exec(function (err, doc) {
-      if (err) { return err }
-      fn(doc)
-    })
   }
 }
 

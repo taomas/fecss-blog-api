@@ -3,6 +3,7 @@ var app = require('koa')()
   , logger = require('koa-logger')
   , json = require('koa-json')
   , views = require('koa-views')
+  , cors = require('kcors')
   , onerror = require('koa-onerror');
 
 var index = require('./routes/index');
@@ -23,6 +24,7 @@ app.use(views('views', {
 app.use(require('koa-bodyparser')());
 app.use(json());
 app.use(logger());
+app.use(cors());
 
 app.use(function *(next){
   var start = new Date;

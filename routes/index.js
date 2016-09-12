@@ -6,18 +6,20 @@ var article = new Article()
 router.get('/', function *(next) {
   this.body = this;
 }).get('topic', function *(next) {
-  article.query({'tags': 'javascript'}, function (doc) {
-    console.log(doc)
+  var that = this
+  yield article.query({'tags': 'javascript'}).then(function (doc) {
+    console.log(doc);
+    that.body = doc;
   })
-  this.body = 'this is topic'
 }).get('write', function *(next) {
+  var that = this
   var data = {
     tags: 'javascript',
-    title: '测试一下',
+    title: '测试一下123',
     content: '<div>123123</div>'
   }
-  article.save(data, function (newData) {
-    console.log(newData)
+  yield article.save(data).then(function (newData) {
+    that.body = newData
   })
 });
 

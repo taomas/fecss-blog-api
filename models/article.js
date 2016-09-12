@@ -1,11 +1,13 @@
 'use strict'
-const mongoose = require('mongoose');
+var mongoose = require('mongoose');
+var moment = require('moment');
+// moment.locale('zh-cn');
 
-const articleSchema = new mongoose.Schema({
+var articleSchema = new mongoose.Schema({
   tags: String,
   title: String,
   content: String,
-  createTime: { type: Date, default: Date.now }
+  createTime: { type: String, default: moment().format('YYYY-MM-DD')}
 });
 
 module.exports = mongoose.model('Article', articleSchema);
