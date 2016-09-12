@@ -42,6 +42,20 @@ koa.use('/users', users.routes(), users.allowedMethods());
 // mount root routes
 app.use(koa.routes());
 
+app.use(function *(next) {
+  try {
+    yield next;
+  } catch (err) {
+    this.status = err.status;
+    this.body = {
+      name: "GowhichApiServerError",
+      code: err.status || 600,
+      message: err.message || "Server internal error.",
+      success: false
+    }
+  }
+});
+
 app.on('error', function(err, ctx){
   logger.error('server error', err, ctx);
 });
