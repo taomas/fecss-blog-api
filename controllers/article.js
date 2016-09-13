@@ -7,7 +7,6 @@ class Article {
     this.model = ArticleModel;
   }
   save (opts) {
-    console.log(opts);
     this.entity = new ArticleModel(opts);
     return this.entity.save(opts);
   }
