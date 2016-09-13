@@ -5,28 +5,28 @@ var article = new Article()
 
 router.get('articles', function*(next) {
   var that = this
-  yield article.query({}).then(function(doc) {
+  yield article.query({}).then(function (doc) {
     that.body = doc
   })
 }).get('articles/:id', function*(next) {
   var hrefArr = this.request.href.split('/')
   var searchId = hrefArr[hrefArr.length - 1]
   var that = this
-  yield article.queryById(searchId).then(function(doc) {
+  yield article.queryById(searchId).then(function (doc) {
     that.body = doc
   })
-}).post('write', function*(next) {
+}).post('articles/create', function*(next) {
   var that = this
-  var data = {
-    tags: 'javascript',
-    title: '测试一下123',
-    content: '<div>123123</div>'
-  }
-  yield article.save(data).then(function(newData) {
-    that.body = newData
+  var opts = this.request.body
+  yield article.save(opts).then(function (newData) {
+    that.body = '创建文章成功！'
   })
-}).post('remove', function*(next) {
-
+}).post('articles/delete', function*(next) {
+  var that = this
+  var id = this.request.body.id
+  yield article.remove(id).then(function (doc) {
+    that.body = '删除文章成功！'
+  })
 });
 
 module.exports = router;

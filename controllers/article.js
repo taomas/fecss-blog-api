@@ -7,12 +7,18 @@ class Article {
     this.model = ArticleModel;
   }
   save (opts) {
+    console.log(opts);
     this.entity = new ArticleModel(opts);
     return this.entity.save(opts);
   }
   query (opts) {
     return this.model.find(opts)
-    .sort({ date: -1 })
+    .sort({ _id: -1 })
+    .exec()
+  }
+  queryAll () {
+    return this.model.find({})
+    .sort({ _id: -1 })
     .exec()
   }
   queryById (id) {
@@ -24,14 +30,6 @@ class Article {
       if (!doc) return fn(null, false);
       return doc.remove();
     })
-    // this.model.findById(id, function (err, doc) {
-    //   if (err) return fn(err);
-    //   if (!doc) return fn(null, false);
-    //   doc.remove(function (err) {
-    //       if (err) return fn(err);
-    //       fn(null, true);
-    //   });
-    // })
   }
 }
 
