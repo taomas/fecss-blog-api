@@ -3,6 +3,7 @@ var app = require('koa')()
   , logger = require('koa-logger')
   , json = require('koa-json')
   , views = require('koa-views')
+  , jwt = require('koa-jwt')
   , cors = require('kcors')
   , onerror = require('koa-onerror');
 
@@ -21,6 +22,16 @@ app.use(require('koa-bodyparser')());
 app.use(json());
 app.use(logger());
 app.use(cors());
+app.use(jwt({ secret: 'shared-secret', passthrough: true }).unless({ path: [/^\/login/] }));
+
+// app.use(function *(){
+//   if (this.url.match(/^\/admin/)) {
+//     this.body = {
+//       message: '用户未登陆',
+//       ok: false
+//     };
+//   }
+// });
 
 app.use(function *(next){
   var start = new Date;
