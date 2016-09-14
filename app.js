@@ -6,7 +6,7 @@ var app = require('koa')()
   , cors = require('kcors')
   , onerror = require('koa-onerror');
 
-var index = require('./routes/index');
+var articles = require('./routes/articles');
 var users = require('./routes/users');
 
 var db = require('./config/mongoose')();
@@ -17,10 +17,6 @@ db.once('open', function () {
 })
 
 // global middlewares
-app.use(views('views', {
-  root: __dirname + '/views',
-  default: 'jade'
-}));
 app.use(require('koa-bodyparser')());
 app.use(json());
 app.use(logger());
@@ -33,28 +29,12 @@ app.use(function *(next){
   console.log('%s %s - %s', this.method, this.url, ms);
 });
 
-app.use(require('koa-static')(__dirname + '/public'));
-
 // routes definition
-koa.use('/', index.routes(), index.allowedMethods());
+koa.use('/articles', articles.routes(), articles.allowedMethods());
 koa.use('/users', users.routes(), users.allowedMethods());
 
 // mount root routes
 app.use(koa.routes());
-
-app.use(function *(next) {
-  try {
-    yield next;
-  } catch (err) {
-    this.status = err.status;
-    this.body = {
-      name: "GowhichApiServerError",
-      code: err.status || 600,
-      message: err.message || "Server internal error.",
-      success: false
-    }
-  }
-});
 
 app.on('error', function(err, ctx){
   logger.error('server error', err, ctx);

@@ -4,10 +4,9 @@ var Article = require('../controllers/article')
 var article = new Article()
 
 function splitDoc (doc, start, limit) {
-  var startIndex = +start,
+  var startIndex = start * limit,
     endIndex = (start + 1) * limit;
   var results = []
-  console.log(endIndex)
   for (var i = 0; i < doc.length; i++) {
     if (i >= startIndex && i < endIndex) {
       results.push(doc[i])
@@ -16,29 +15,34 @@ function splitDoc (doc, start, limit) {
   return results
 }
 
-router.get('articles', function*(next) {
+router.get('/', function*(next) {
   var that = this
   var query = this.request.query
   var limit = query && query.limit,
     start = query && query.start;
-  console.log(query)
   yield article.query({}).then(function (doc) {
-    that.body = splitDoc(doc, start, limit)
+    var results = splitDoc(doc, start, limit)
+    var maxIndex = Math.floor(doc.length / limit) // 向上取整
+    that.body = {
+      message: '获取文章成功',
+      articles: results,
+      maxIndex: maxIndex
+    }
   })
-}).get('articles/:id', function*(next) {
+}).get('/:id', function*(next) {
   var hrefArr = this.request.href.split('/')
   var searchId = hrefArr[hrefArr.length - 1]
   var that = this
   yield article.queryById(searchId).then(function (doc) {
     that.body = doc
   })
-}).post('articles/create', function*(next) {
+}).post('/create', function*(next) {
   var that = this
   var opts = this.request.body
   yield article.save(opts).then(function (newData) {
     that.body = '创建文章成功！'
   })
-}).post('articles/delete', function*(next) {
+}).post('/delete', function*(next) {
   var that = this
   var id = this.request.body.id
   yield article.remove(id).then(function (doc) {

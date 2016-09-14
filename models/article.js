@@ -1,7 +1,6 @@
 'use strict'
 var mongoose = require('mongoose');
 var moment = require('moment');
-// moment.locale('zh-cn');
 
 var articleSchema = new mongoose.Schema({
   tags: String,
