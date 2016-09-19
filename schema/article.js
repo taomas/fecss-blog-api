@@ -6,6 +6,7 @@ var articleSchema = new mongoose.Schema({
   tags: String,
   title: String,
   content: String,
+  // createTime: { type: String, default: Date.now()}
   createTime: { type: String, default: moment().format('YYYY-MM-DD')}
 });
 

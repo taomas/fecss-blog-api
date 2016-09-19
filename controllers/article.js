@@ -23,7 +23,7 @@ const getAll = function*(next) {
   const token = ctx.request.headers.token || '';
   yield article.query({}).then(function (doc) {
     var results = splitDoc(doc, start, limit)
-    var maxIndex = Math.floor(doc.length / limit) // 向上取整
+    var maxIndex = Math.floor((doc.length - 1) / limit) // 向上取整
     ctx.body = {
       message: '获取文章成功',
       articles: results,

@@ -9,6 +9,7 @@ var app = require('koa')()
 
 var articles = require('./routes/articles');
 var users = require('./routes/users');
+var admin = require('./routes/admin')
 
 var db = require('./config/mongoose')();
 db.on('error', console.error.bind(console, 'error: connect error!'))
@@ -24,30 +25,41 @@ app.use(logger());
 app.use(cors());
 app.use(jwt({secret: 'shared-secret', passthrough: true}));
 
+// 后台用户认证
 app.use(function *(next){
   var ctx = this
-  console.log(ctx.url);
-  if (this.url.indexOf('login') !== -1) {
+  var needAuth = ctx.request.body.needAuth || ctx.request.query.needAuth || 1;
+  // 如果不是admin，直接跳过该中间件
+  if (+needAuth === 1) {
     return yield next;
   }
-  var profile = jwt.verify(ctx.request.headers.token || ctx.request.body.token, 'shared-secret');
-  console.log(ctx.request.headers.token, profile);
-  console.log(Date.now() - profile.original_iat);
-  if (profile) {
-    if (Date.now() - profile.original_iat  < 7 * 24 * 60 * 60 * 1000) {
-      ctx.user_token = profile;
-      yield next;
+  var token = ctx.request.headers.token || '';
+  if (token) {
+    var profile = jwt.verify(token, 'shared-secret');
+    if (profile) {
+      // 设置过期时间为7天
+      if (Date.now() - profile.original_iat  < 7 * 24 * 60 * 60 * 1000) {
+        ctx.user_token = profile;
+        yield next;
+      } else {
+        ctx.status = 401;
+        ctx.body = {
+          success: false,
+          message: 'token已过期'
+        };
+      }
     } else {
       ctx.status = 401;
       ctx.body = {
         success: false,
-        message: 'token已过期'
-      };
+        message: 'token认证失败'
+      }
     }
   } else {
+    ctx.status = 401;
     ctx.body = {
       success: false,
-      message: 'token信息错误'
+      message: 'token认证失败'
     }
   }
 });
@@ -62,6 +74,7 @@ app.use(function *(next){
 // routes definition
 koa.use('/articles', articles.routes(), articles.allowedMethods());
 koa.use('/users', users.routes(), users.allowedMethods());
+koa.use('/admin', admin.routes(), admin.allowedMethods());
 
 // mount root routes
 app.use(koa.routes());

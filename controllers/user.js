@@ -48,6 +48,38 @@ const register = function *(next) {
   })
 }
 
+const userAuth = function *(next) {
+  var token = ctx.request.headers.token || '';
+  if (token) {
+    var profile = jwt.verify(token, 'shared-secret');
+    if (profile) {
+      // 设置过期时间为7天
+      if (Date.now() - profile.original_iat  < 7 * 24 * 60 * 60 * 1000) {
+        ctx.user_token = profile;
+        yield next;
+      } else {
+        ctx.status = 401;
+        ctx.body = {
+          success: false,
+          message: 'token已过期'
+        };
+      }
+    } else {
+      ctx.status = 401;
+      ctx.body = {
+        success: false,
+        message: 'token认证失败'
+      }
+    }
+  } else {
+    ctx.status = 401;
+    ctx.body = {
+      success: false,
+      message: 'token认证失败'
+    }
+  }
+}
+
 const query = function *(next) {
   const ctx = this;
   yield user.queryAll().then(function (doc) {
