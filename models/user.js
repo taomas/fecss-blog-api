@@ -1,9 +1,25 @@
 'use strict'
-var mongoose = require('mongoose');
 
-var userSchema = new mongoose.Schema({
-  username: String,
-  password: String
-});
+const UserModel = require('../schema/user');
 
-module.exports = mongoose.model('User', userSchema);
+class User {
+  constructor () {
+    this.model = UserModel;
+  }
+  save (opts, fn) {
+    this.entity = new UserModel(opts);
+    return this.entity.save(opts);
+  }
+  query (opts) {
+    console.log(opts);
+    return this.model.find(opts).exec()
+  }
+  queryAll () {
+    return this.model.find({}).exec()
+  }
+  removeAll () {
+    return this.model.remove({})
+  }
+}
+
+module.exports = User

@@ -10,6 +10,7 @@
     "cors": "^2.8.1",
     "debug": "^2.2.0",
     "jade": "~1.11.0",
+    "jsonwebtoken": "^7.1.9",
     "kcors": "^1.2.1",
     "koa": "^1.1.2",
     "koa-bodyparser": "^2.0.1",

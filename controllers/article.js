@@ -1,35 +1,78 @@
 'use strict'
 
-const ArticleModel = require('../models/article');
+const Article = require('../models/article')
+const article = new Article()
 
-class Article {
-  constructor () {
-    this.model = ArticleModel;
+const splitDoc = function (doc, start, limit) {
+  let startIndex = start * limit,
+    endIndex = (start + 1) * limit;
+  let results = []
+  for (let i = 0; i < doc.length; i++) {
+    if (i >= startIndex && i < endIndex) {
+      results.push(doc[i])
+    }
   }
-  save (opts) {
-    this.entity = new ArticleModel(opts);
-    return this.entity.save(opts);
-  }
-  query (opts) {
-    return this.model.find(opts)
-    .sort({ _id: -1 })
-    .exec()
-  }
-  queryAll () {
-    return this.model.find({})
-    .sort({ _id: -1 })
-    .exec()
-  }
-  queryById (id) {
-    console.log(id)
-    return this.model.findById(id)
-  }
-  remove (id, fn) {
-    return this.model.findById(id).then(function (doc) {
-      if (!doc) return fn(null, false);
-      return doc.remove();
-    })
-  }
+  return results
 }
 
-module.exports = Article;
+const getAll = function*(next) {
+  const ctx = this
+  const query = ctx.request.query
+  const limit = query && query.limit,
+    start = query && query.start;
+  const token = ctx.request.headers.token || '';
+  yield article.query({}).then(function (doc) {
+    var results = splitDoc(doc, start, limit)
+    var maxIndex = Math.floor(doc.length / limit) // 向上取整
+    ctx.body = {
+      message: '获取文章成功',
+      articles: results,
+      maxIndex: maxIndex
+    }
+  })
+}
+
+const getArticle = function*(next) {
+  const ctx = this
+  const hrefs = this.request.href.split('/')
+  const searchId = hrefs[hrefs.length - 1]
+  yield article.queryById(searchId).then(function (doc) {
+    ctx.body = doc
+  })
+}
+
+const createArticle = function*(next) {
+  const ctx = this
+  const opts = this.request.body
+  yield article.save(opts).then(function (newData) {
+    ctx.body = {
+      message: '创建文章成功！',
+      doc: newData,
+      ok: true
+    }
+  }).catch(function (error) {
+    ctx.body = {
+      message: '创建文章失败！',
+      error: error,
+      ok: false
+    }
+  })
+}
+
+const deleteAll = function*(next) {
+  const ctx = this
+  const id = this.request.body.id
+  yield article.remove(id).then(function (doc) {
+    ctx.body = {
+      message: '删除文章成功！',
+      ok: true
+    }
+  })
+}
+
+module.exports = {
+  getAll,
+  getArticle,
+  createArticle,
+  deleteAll
+}

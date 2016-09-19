@@ -22,16 +22,35 @@ app.use(require('koa-bodyparser')());
 app.use(json());
 app.use(logger());
 app.use(cors());
-app.use(jwt({ secret: 'shared-secret', passthrough: true }).unless({ path: [/^\/login/] }));
+app.use(jwt({secret: 'shared-secret', passthrough: true}));
 
-// app.use(function *(){
-//   if (this.url.match(/^\/admin/)) {
-//     this.body = {
-//       message: '用户未登陆',
-//       ok: false
-//     };
-//   }
-// });
+app.use(function *(next){
+  var ctx = this
+  console.log(ctx.url);
+  if (this.url.indexOf('login') !== -1) {
+    return yield next;
+  }
+  var profile = jwt.verify(ctx.request.headers.token || ctx.request.body.token, 'shared-secret');
+  console.log(ctx.request.headers.token, profile);
+  console.log(Date.now() - profile.original_iat);
+  if (profile) {
+    if (Date.now() - profile.original_iat  < 7 * 24 * 60 * 60 * 1000) {
+      ctx.user_token = profile;
+      yield next;
+    } else {
+      ctx.status = 401;
+      ctx.body = {
+        success: false,
+        message: 'token已过期'
+      };
+    }
+  } else {
+    ctx.body = {
+      success: false,
+      message: 'token信息错误'
+    }
+  }
+});
 
 app.use(function *(next){
   var start = new Date;
