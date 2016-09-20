@@ -37,7 +37,18 @@ const getArticle = function*(next) {
   const hrefs = this.request.href.split('/')
   const searchId = hrefs[hrefs.length - 1]
   yield article.queryById(searchId).then(function (doc) {
-    ctx.body = doc
+    if (doc) {
+      ctx.body = {
+        success: true,
+        article: doc,
+        message: '获取文章成功'
+      }
+    } else {
+      ctx.body = {
+        success: false,
+        message: '获取文章失败'
+      }
+    }
   })
 }
 
@@ -59,6 +70,31 @@ const createArticle = function*(next) {
   })
 }
 
+const editArticle = function*(next) {
+  const ctx = this
+  const opts = this.request.body
+  const articleId = opts.articleId
+  const articleDetail = opts.articleDetail
+  yield article.queryById(articleId).then(function (doc) {
+    doc.sourceContent = articleDetail.sourceContent
+    doc.content = articleDetail.content
+    return doc.save()
+  }).then(function (result) {
+    if (result) {
+      ctx.body = {
+        success: true,
+        message: '修改文章成功！',
+        article: result
+      }
+    } else {
+      ctx.body = {
+        success: false,
+        message: '修改文章失败！'
+      }
+    }
+  })
+}
+
 const deleteAll = function*(next) {
   const ctx = this
   const id = this.request.body.id
@@ -74,5 +110,6 @@ module.exports = {
   getAll,
   getArticle,
   createArticle,
-  deleteAll
+  deleteAll,
+  editArticle
 }
