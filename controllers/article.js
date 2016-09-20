@@ -59,13 +59,13 @@ const createArticle = function*(next) {
     ctx.body = {
       message: '创建文章成功！',
       doc: newData,
-      ok: true
+      success: true
     }
   }).catch(function (error) {
     ctx.body = {
       message: '创建文章失败！',
       error: error,
-      ok: false
+      success: false
     }
   })
 }
@@ -76,8 +76,7 @@ const editArticle = function*(next) {
   const articleId = opts.articleId
   const articleDetail = opts.articleDetail
   yield article.queryById(articleId).then(function (doc) {
-    doc.sourceContent = articleDetail.sourceContent
-    doc.content = articleDetail.content
+    Object.assign(doc, articleDetail) // 修改doc
     return doc.save()
   }).then(function (result) {
     if (result) {
@@ -101,7 +100,7 @@ const deleteAll = function*(next) {
   yield article.remove(id).then(function (doc) {
     ctx.body = {
       message: '删除文章成功！',
-      ok: true
+      success: true
     }
   })
 }
