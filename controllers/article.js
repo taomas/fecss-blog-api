@@ -52,6 +52,64 @@ const getArticle = function*(next) {
   })
 }
 
+const getArchive = function*(next) {
+  const ctx = this
+  let result = []
+  yield article.query({}).then(function (doc) {
+    if (doc) {
+      for (let i = 0; i < doc.length; i++) {
+        let newEle = {
+          _id: doc[i]._id,
+          createTime: doc[i].createTime,
+          title: doc[i].title
+        }
+        result.push(newEle)
+      }
+    }
+    ctx.body = {
+      message: '获取文章成功',
+      articles: result
+    }
+  })
+}
+
+const getTagsList = function*(next) {
+  const ctx = this
+  const opts = this.request.body
+  let result = []
+  yield article.query({}).then(function (doc) {
+    if (doc) {
+      for (let i in doc) {
+        const tags = doc[i].tags
+        if (result.indexOf(tags) === -1) {
+          result.push(tags)
+        }
+      }
+      ctx.body = {
+        success: true,
+        message: '获取标签成功',
+        tagsList: result
+      }
+    }
+  })
+}
+
+const getTagsContent = function*(next) {
+  const ctx = this
+  const hrefs = this.request.href.split('/')
+  const tags = hrefs[hrefs.length - 1]
+  yield article.query({tags: tags}).then(function (doc) {
+    ctx.body = {
+      success: true,
+      message: '获取标签成功',
+      tagsContent: {
+        tags: tags,
+        content: doc
+      }
+    }
+  })
+}
+
 const createArticle = function*(next) {
   const ctx = this
   const opts = this.request.body
@@ -108,7 +166,10 @@ const deleteAll = function*(next) {
 module.exports = {
   getAll,
   getArticle,
+  getArchive,
   createArticle,
   deleteAll,
-  editArticle
+  editArticle,
+  getTagsList,
+  getTagsContent
 }
