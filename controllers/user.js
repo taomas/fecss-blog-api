@@ -37,13 +37,13 @@ const register = function *(next) {
          ok: false
        }
     } else {
-      user.query(opts).then(function (doc) {
-        ctx.body = {
-          message: '注册成功',
-          data: doc,
-          ok: true
-        }
-      })
+      return user.save(opts)
+    }
+  }).then(function (doc) {
+    ctx.body = {
+      message: '注册成功',
+      data: doc,
+      ok: true
     }
   })
 }

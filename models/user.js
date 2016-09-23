@@ -7,11 +7,10 @@ class User {
     this.model = UserModel;
   }
   save (opts, fn) {
-    this.entity = new UserModel(opts);
-    return this.entity.save(opts);
+    this.entity = new UserModel(opts)
+    return this.entity.save(opts)
   }
   query (opts) {
-    console.log(opts);
     return this.model.find(opts).exec()
   }
   queryAll () {

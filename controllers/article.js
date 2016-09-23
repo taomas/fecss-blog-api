@@ -97,7 +97,7 @@ const getTagsList = function*(next) {
 const getTagsContent = function*(next) {
   const ctx = this
   const hrefs = this.request.href.split('/')
-  const tags = hrefs[hrefs.length - 1]
+  const tags = decodeURIComponent(hrefs[hrefs.length - 1])
   yield article.query({tags: tags}).then(function (doc) {
     ctx.body = {
       success: true,
