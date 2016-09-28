@@ -25,7 +25,7 @@ mongod
 // 启动服务端
 git clone git@github.com:wendaosanshou/fecss-blog-api.git
 
-cd jackblog-api-koa
+cd fecss-blog-api
 
 npm install
 
