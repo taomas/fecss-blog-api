@@ -29,5 +29,5 @@ cd fecss-blog-api
 
 npm install
 
-npm start
+npm run dev
 ```

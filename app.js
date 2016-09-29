@@ -28,8 +28,6 @@ app.use(jwt({secret: 'shared-secret', passthrough: true}));
 // 后台用户认证
 app.use(function *(next){
   var ctx = this
-  console.log(ctx.request.url)
-  // var needAuth = ctx.request.body.needAuth || ctx.request.query.needAuth || 1;
   // 如果不是admin，直接跳过该中间件
   if (ctx.request.url.indexOf('admin') === -1) {
     return yield next;
