@@ -3,10 +3,10 @@ var mongoose = require('mongoose');
 var moment = require('moment');
 
 var articleSchema = new mongoose.Schema({
-  tags: String,
   title: String,
-  content: String,
-  sourceContent: String,
+  tags: String,
+  sourceArticle: String,
+  markedArticle: String,
   createTime: { type: String, default: moment().format('YYYY-MM-DD')}
 });
 
