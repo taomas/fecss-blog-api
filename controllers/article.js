@@ -110,15 +110,9 @@ const getTagsContent = function*(next) {
   })
 }
 
-const getCreateTime = function () {
-  const date = new Date()
-  return date.getFullYear() + '-' + (date.getMonth() + 1 ) + '-' + date.getDate()
-}
-
 const createArticle = function*(next) {
   const ctx = this
   const opts = this.request.body
-  opts.createTime = getCreateTime()
   yield article.save(opts).then(function (newData) {
     ctx.body = {
       message: '创建文章成功！',
